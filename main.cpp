@@ -40,6 +40,18 @@ public:
         return *this;
     }
 
+    Matrix operator+(const Matrix& other) const {
+        Matrix added_matrix(matrix_size);
+        int sum;
+        for (int i=0; i < matrix_size; i++) {
+            for (int j=0; j < matrix_size; j++) {
+                sum = matrix_data[i][j] + other.matrix_data[i][j];
+                added_matrix.matrix_data[i][j] = sum;
+            }
+        }
+        return added_matrix;
+    }
+
     ~Matrix() {
         for (int i = 0; i < matrix_size; ++i) {
             delete[] matrix_data[i];
@@ -90,10 +102,7 @@ void read_matrix_from_file(const string& file_name, Matrix& matrix_1, Matrix& ma
     }
 }
 
-
-
 void print_matrix(const Matrix& matrix) {
-    cout << "Matrix:" << endl;
     for (int i=0; i < matrix.matrix_size; i++) {
         for (int j=0; j < matrix.matrix_size; j++) {
             cout << matrix.matrix_data[i][j] << ' ';
@@ -104,11 +113,22 @@ void print_matrix(const Matrix& matrix) {
 }
 
 void print_matrix(const Matrix& matrix_1, const Matrix& matrix_2) {
-    // TODO: Print both matrices to the console
+    print_matrix(matrix_1);
+    print_matrix(matrix_2);
 }
 
 Matrix add_matrices(const Matrix& matrix_1, const Matrix& matrix_2) {
-    // TODO: Implement matrix addition
+    int size = matrix_1.matrix_size;
+    Matrix added_matrix(matrix_1.matrix_size); // Create matrix to store sum of matrices
+    
+    // Iterate through matrix and sum matrices for each element
+    for (int i=0; i < size; i++) {
+        for (int j=0; j < size; j++) {
+            int sum = matrix_1.matrix_data[i][j] + matrix_2.matrix_data[i][j];
+            added_matrix.matrix_data[i][j] = sum;
+        }
+    }
+    return added_matrix;
 }
 
 Matrix multiply_matrices(const Matrix& matrix_1, const Matrix& matrix_2) {
@@ -116,7 +136,7 @@ Matrix multiply_matrices(const Matrix& matrix_1, const Matrix& matrix_2) {
 }
 
 // Overloaded + operator for matrix addition
-Matrix operator+(const Matrix& matrix_1, const Matrix& matrix_2);
+// Matrix operator+(const Matrix& matrix_1, const Matrix& matrix_2);
 
 // Overloaded * operator for matrix multiplication
 Matrix operator*(const Matrix& matrix_1, const Matrix& matrix_2);
@@ -133,18 +153,15 @@ void swap_matrix_row(Matrix& matrix, int row1, int row2) {
 int main(int argc, char* argv[]) {
     Matrix matrix_1, matrix_2;
     read_matrix_from_file("matrix.txt", matrix_1, matrix_2);
-    print_matrix(matrix_1);
-    print_matrix(matrix_2);
-    cout << "Hello" << endl;
 
-    // cout << "print_matrix" << endl;
-    // print_matrix(matrix_1, matrix_2);
+    cout << "print_matrix" << endl;
+    print_matrix(matrix_1, matrix_2);
 
-    // cout << "add_matrices result:" << endl;
-    // Matrix add_result_1 = add_matrices(matrix_1, matrix_2);
-    // Matrix add_result_2 = matrix_1 + matrix_2;
-    // print_matrix(add_result_1);
-    // print_matrix(add_result_2);
+    cout << "add_matrices result:" << endl;
+    Matrix add_result_1 = add_matrices(matrix_1, matrix_2);
+    Matrix add_result_2 = matrix_1 + matrix_2;
+    print_matrix(add_result_1);
+    print_matrix(add_result_2);
 
     // cout << "multiply_matrices result:" << endl;
     // Matrix multiply_result_1 = multiply_matrices(matrix_1, matrix_2);
