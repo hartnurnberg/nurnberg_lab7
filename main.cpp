@@ -52,6 +52,20 @@ public:
         return added_matrix;
     }
 
+    Matrix operator*(const Matrix& other) const {
+        int size = matrix_size;
+        Matrix product_matrix(size);
+        for (int i=0; i < size; i++) {
+            for (int j=0; j < size; j++) {
+                for (int k=0; k < size; k++) {
+                    // Add dot product of each row/column pair to corresponding product_matrix entry
+                    product_matrix.matrix_data[i][j] += matrix_data[i][k]*other.matrix_data[k][j];
+                }
+            }
+        }
+        return product_matrix;
+    }
+
     ~Matrix() {
         for (int i = 0; i < matrix_size; ++i) {
             delete[] matrix_data[i];
@@ -133,16 +147,46 @@ Matrix add_matrices(const Matrix& matrix_1, const Matrix& matrix_2) {
 
 Matrix multiply_matrices(const Matrix& matrix_1, const Matrix& matrix_2) {
     // TODO: Implement matrix multiplication
+    int size = matrix_1.matrix_size;
+    Matrix product_matrix(size);
+    for (int i=0; i < size; i++) {
+        for (int j=0; j < size; j++) {
+            for (int k=0; k < size; k++) {
+                // Add dot product of each row/column pair to corresponding product_matrix entry
+                product_matrix.matrix_data[i][j] += matrix_1.matrix_data[i][k]*matrix_2.matrix_data[k][j];
+            }
+        }
+    }
+    return product_matrix;
 }
 
 // Overloaded + operator for matrix addition
 // Matrix operator+(const Matrix& matrix_1, const Matrix& matrix_2);
 
 // Overloaded * operator for matrix multiplication
-Matrix operator*(const Matrix& matrix_1, const Matrix& matrix_2);
+// Matrix operator*(const Matrix& matrix_1, const Matrix& matrix_2);
 
 void get_diagonal_sum(const Matrix& matrix) {
-    // TODO: Calculate and print the sum of the diagonal elements
+    int sum = 0;
+    int center;
+    int isOdd = matrix.matrix_size % 2 == 1;
+    if (isOdd) {
+        center = matrix.matrix_size / 2 + 1;
+    }
+    // Iterate through main diagonal and sum each diagonal
+    for (int i=0; i < matrix.matrix_size; i++) {
+        // Don't sum center, as it will be summed in secondary diagonal loop
+        if (isOdd && i == center) {
+            continue;
+        }
+        sum += matrix.matrix_data[i][i];
+    }
+
+    // Iterate through and sum secondary diagonals
+    for (int i=0; i < matrix.matrix_size; i++) {
+        sum += matrix.matrix_data[i][matrix.matrix_size - i];
+    }
+    cout << "Sum of diagonals: " << sum << endl;
 }
 
 void swap_matrix_row(Matrix& matrix, int row1, int row2) {
@@ -163,14 +207,14 @@ int main(int argc, char* argv[]) {
     print_matrix(add_result_1);
     print_matrix(add_result_2);
 
-    // cout << "multiply_matrices result:" << endl;
-    // Matrix multiply_result_1 = multiply_matrices(matrix_1, matrix_2);
-    // Matrix multiply_result_2 = matrix_1 * matrix_2;
-    // print_matrix(multiply_result_1);
-    // print_matrix(multiply_result_2);
+    cout << "multiply_matrices result:" << endl;
+    Matrix multiply_result_1 = multiply_matrices(matrix_1, matrix_2);
+    Matrix multiply_result_2 = matrix_1 * matrix_2;
+    print_matrix(multiply_result_1);
+    print_matrix(multiply_result_2);
 
-    // cout << "get matrix diagonal sum" << endl;
-    // get_diagonal_sum(matrix_1);
+    cout << "get matrix diagonal sum" << endl;
+    get_diagonal_sum(matrix_1);
 
     // cout << "swap matrix rows" << endl;
     // swap_matrix_row(matrix_1, 0, 1);
