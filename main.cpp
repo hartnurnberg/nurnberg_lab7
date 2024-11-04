@@ -79,43 +79,53 @@ void read_matrix_from_file(const string& file_name, Matrix& matrix_1, Matrix& ma
     // TODO: Read matrix data from the file
     // Make sure to handle potential errors and invalid input
     // Create an input file stream object named 'file' and
+
     // open the file
     ifstream file(file_name);
 
-    // String to store each line of the file.
-    // string line;
     int size;
-    file >> size;
-    matrix_1 = Matrix(size);
-    matrix_2 = Matrix(size);
 
     if (file.is_open()) {
-        // Read each line from the file and store it in the
-        // 'line' variable.
+        file >> size;
+        if (size <= 0) { 
+            cerr << "Error: Size must be greater than 0." << endl;
+        }
+        matrix_1 = Matrix(size);
+        matrix_2 = Matrix(size);
+        // Read each int and store it in matrix_1
         for (int i=0; i < size; i++) {
             for (int j=0; j < size; j++){
-                file >> matrix_1.matrix_data[i][j];
+                if (!(file >> matrix_1.matrix_data[i][j])) {  // Validate input for matrix_2
+                    cerr << "Error: Invalid input at position: (" << i << "," << j << ")" << endl;
+                    file.close();
+                    return;
+                }
             }
         }
 
+        // Read each int and store it in matrix_2
         for (int i=0; i < size; i++) {
             for (int j=0; j < size; j++){
-                file >> matrix_2.matrix_data[i][j];
+                if (!(file >> matrix_2.matrix_data[i][j])) {  // Validate input for matrix_2
+                    cerr << "Error: Invalid input at position: (" << i << "," << j << ")" << endl;
+                    file.close();
+                    return;
+                }
             }
         }
 
-        // Close the file stream once all lines have been
-        // read.
+        // Close the file stream
         file.close();
     }
     
     else {
         // Print an error message to the standard error
         // stream if the file cannot be opened.
-        cerr << "Unable to open file!" << endl;
+        cerr << "Error: Cannot open file." << endl;
     }
-}
+};
 
+// Print a matrix
 void print_matrix(const Matrix& matrix) {
     for (int i=0; i < matrix.matrix_size; i++) {
         for (int j=0; j < matrix.matrix_size; j++) {
@@ -126,6 +136,7 @@ void print_matrix(const Matrix& matrix) {
     cout << endl;
 }
 
+// Print two matrices
 void print_matrix(const Matrix& matrix_1, const Matrix& matrix_2) {
     print_matrix(matrix_1);
     print_matrix(matrix_2);
@@ -168,8 +179,8 @@ Matrix multiply_matrices(const Matrix& matrix_1, const Matrix& matrix_2) {
 
 void get_diagonal_sum(const Matrix& matrix) {
     int sum = 0;
-    int center;
-    int isOdd = matrix.matrix_size % 2 == 1;
+    int center = 0;
+    bool isOdd = matrix.matrix_size % 2 == 1;
     if (isOdd) {
         center = matrix.matrix_size / 2 + 1;
     }
@@ -184,15 +195,33 @@ void get_diagonal_sum(const Matrix& matrix) {
 
     // Iterate through and sum secondary diagonals
     for (int i=0; i < matrix.matrix_size; i++) {
-        sum += matrix.matrix_data[i][matrix.matrix_size - i];
+        sum += matrix.matrix_data[i][matrix.matrix_size - i - 1];
     }
     cout << "Sum of diagonals: " << sum << endl;
+}
+
+// Return whether an integer is in a given range
+bool isInRange(int num, int low, int high) {
+    if (num >= low && num <= high) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 void swap_matrix_row(Matrix& matrix, int row1, int row2) {
     // TODO: Swap the rows 'row1' and 'row2' in the matrix
     //    Handle invalid row indices
+    if (!isInRange(row1, 0, matrix.matrix_size) || !isInRange(row2, 0, matrix.matrix_size)) {
+        cout << "Invalid row index; cannot swap rows." << endl;
+        return;
+    }
+
+    double *temp = matrix.matrix_data[row1];
+    matrix.matrix_data[row1] = matrix.matrix_data[row2];
+    matrix.matrix_data[row2] = temp;
 }
+
 
 int main(int argc, char* argv[]) {
     Matrix matrix_1, matrix_2;
@@ -215,9 +244,11 @@ int main(int argc, char* argv[]) {
 
     cout << "get matrix diagonal sum" << endl;
     get_diagonal_sum(matrix_1);
+    cout << endl;
 
-    // cout << "swap matrix rows" << endl;
-    // swap_matrix_row(matrix_1, 0, 1);
+    cout << "swap matrix rows" << endl;
+    swap_matrix_row(matrix_1, 0, 1);
+    print_matrix(matrix_1);
 
     return 0;
 }
